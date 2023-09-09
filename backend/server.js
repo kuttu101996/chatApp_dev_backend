@@ -2,8 +2,7 @@ const express = require("express");
 require("dotenv").config();
 const cors = require("cors");
 const colors = require("colors");
-const path = require("path");
-const cookieParser = require("cookie-parser");
+// const path = require("path");
 const nodemailer = require("nodemailer");
 
 const { connection } = require("./config/db");
@@ -24,7 +23,7 @@ const transporter = nodemailer.createTransport({
 const app = express();
 app.use(cors());
 app.use(express.json());
-app.use(cookieParser());
+// app.use(cookieParser());
 
 app.use("/api/user", userRouter);
 app.use("/api/chat", chatRouter);
