@@ -3,8 +3,8 @@ require("dotenv").config();
 const cors = require("cors");
 const colors = require("colors");
 const path = require("path");
-const cookieParser = require("cookie-parser");
-const nodemailer = require("nodemailer");
+const cookieParser = require("cookie-parser")
+const nodemailer = require("nodemailer")
 
 const { connection } = require("./config/db");
 const { userRouter } = require("./Routes/user.router");
@@ -12,14 +12,14 @@ const { notFound, errorHandler } = require("./middleware/errorHandler");
 const { chatRouter } = require("./Routes/chat.router");
 const { messageRouter } = require("./Routes/message.router");
 
-// const transporter = nodemailer.createTransport({
-//   host: "",
-//   port: 587,
-//   auth: {
-//     user: "",
-//     pass: ""
-//   }
-// })
+const transporter = nodemailer.createTransport({
+  host: "",
+  port: 587,
+  auth: {
+    user: "",
+    pass: ""
+  }
+})
 
 const app = express();
 app.use(cors());
@@ -63,7 +63,7 @@ const server = app.listen(process.env.port, async () => {
 const io = require("socket.io")(server, {
   pingTimeout: 60000,
   cors: {
-    origin: "https://chatapp-dev.netlify.app",
+    origin: "https://chatapp-d.netlify.app",
   },
 });
 
