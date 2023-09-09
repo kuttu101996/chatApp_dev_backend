@@ -50,7 +50,6 @@ const loginUser = asyncHandler(async (req, res) => {
 
   if (userExist && (await userExist.matchPass(password))) {
     userExist.password = "";
-    // res.cookie(`${userExist._id}`, `${generateToken(userExist._id)}`);
     res.status(201).json({
       msg: "Login Successful",
       userExist,
