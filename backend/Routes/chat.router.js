@@ -6,8 +6,8 @@ const {
   createGroupChat,
   renameGroup,
   addToGroup,
-  leaveGroup,
   removeFromGroup,
+  deleteChat,
 } = require("../controllers/chatController");
 
 const chatRouter = express.Router();
@@ -15,7 +15,8 @@ const chatRouter = express.Router();
 chatRouter
   .route("/")
   .post(authentication, accessChat)
-  .get(authentication, fetchChats);
+  .get(authentication, fetchChats)
+  .delete(authentication, deleteChat);
 
 chatRouter.route("/group").post(authentication, createGroupChat);
 

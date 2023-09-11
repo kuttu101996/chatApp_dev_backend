@@ -27,8 +27,11 @@ const accessChat = asyncHandler(async function (req, res) {
   if (isChat.length > 0) {
     res.send(isChat[0]);
   } else {
+    let user1 = await User.find({ _id: userId });
+    let user2 = await User.find({ _id: req.user._id });
+
     var chatData = {
-      chatName: "sender",
+      chatName: `${user2[0].name} - ${user1[0].name}`,
       isGroupChat: false,
       users: [req.user._id, userId],
     };
@@ -69,6 +72,10 @@ const fetchChats = asyncHandler(async function (req, res) {
     res.status(400);
     throw new Error(error);
   }
+});
+
+const deleteChat = asyncHandler(async (req, res) => {
+  
 });
 
 const createGroupChat = asyncHandler(async function (req, res) {
@@ -172,4 +179,5 @@ module.exports = {
   renameGroup,
   addToGroup,
   removeFromGroup,
+  deleteChat
 };
