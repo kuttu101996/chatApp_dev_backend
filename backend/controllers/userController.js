@@ -43,13 +43,19 @@ const registerUser = asyncHandler(async (req, res) => {
       try {
         const chatCreate = await Chat.create(chatData);
 
-        var messageData = {
+        var welcomeMsg1 = {
           sender: findAdmin[0]._id,
-          content: `This is an auto generated messagae, you don't need to respond to it.\n Hello ${newUser.name}, this is a welcome message from Team - Commu-Cate. We hope you'll enjoy your experience with us.`,
+          content: `Hello ${newUser.name}, this is a welcome message from Team - Commu-Cate. We hope you'll enjoy your experience with us.`,
+          chat: chatCreate._id,
+        };
+        var welcomeMsg2 = {
+          sender: findAdmin[0]._id,
+          content: `This is an auto generated message you don't need to respond to it.`,
           chat: chatCreate._id,
         };
 
-        var messageCreate = await Message.create(messageData);
+        await Message.create(welcomeMsg1);
+        var messageCreate = await Message.create(welcomeMsg2);
         await Chat.findByIdAndUpdate(chatCreate._id, {
           latestMessage: messageCreate,
         });
@@ -59,7 +65,6 @@ const registerUser = asyncHandler(async (req, res) => {
           newUser,
           token: generateToken(newUser._id),
         });
-        // res.status(200).send(fullChat);
       } catch (error) {
         res.status(400);
         throw new Error({
@@ -122,6 +127,12 @@ const deleteAccount = asyncHandler(async (req, res) => {
     }
 
     // Find all chats where the user is a participant and isGroupChat is false
+
+    // const chatsToDelete = await Chat.find({
+    //   users: userId,
+    //   isGroupChat: false,
+    // });
+
     const chatsToDelete = await Chat.find({
       isGroupChat: false,
       users: { $elemMatch: { $eq: userId } },
