@@ -62,7 +62,7 @@ const server = app.listen(process.env.port, async () => {
 const io = require("socket.io")(server, {
   pingTimeout: 60000,
   cors: {
-    origin: "https://commu-cate.netlify.app",
+    origin: "https://commu-cate-update.netlify.app",
   },
 });
 
