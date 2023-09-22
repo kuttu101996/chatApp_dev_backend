@@ -1,0 +1,9 @@
+create sendMessageFromElseWhere route in messageController
+
+create updateUser route in userController
+
+user model password not required and mobile key added
+
+messageRouter sendMessageFromElseWhere added without authentication
+
+userRouter updateUser added with /:id with authentication

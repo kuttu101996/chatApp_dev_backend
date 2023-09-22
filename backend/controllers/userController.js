@@ -160,4 +160,37 @@ const deleteAccount = asyncHandler(async (req, res) => {
   }
 });
 
-module.exports = { registerUser, loginUser, allUser, deleteAccount };
+const updateUser = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { name, password, pic, mobile } = req.body;
+  let updatedUser;
+
+  if (name) {
+    updatedUser = await User.findByIdAndUpdate(id, { name }, { new: true });
+  } else if (password) {
+    bcrypt.hash(password, 4, async function (err, hash) {
+      if (err) {
+        return res.status(400).send(err.message);
+      }
+      updatedUser = await User.findByIdAndUpdate(
+        id,
+        { password: hash },
+        { new: true }
+      );
+    });
+  } else if (pic) {
+    updatedUser = await User.findByIdAndUpdate(id, { pic }, { new: true });
+  } else if (mobile) {
+    updatedUser = await User.findByIdAndUpdate(id, { mobile }, { new: true });
+  }
+
+  return res.status(201).send(updatedUser);
+});
+
+module.exports = {
+  registerUser,
+  loginUser,
+  allUser,
+  deleteAccount,
+  updateUser,
+};

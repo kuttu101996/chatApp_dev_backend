@@ -1,4 +1,5 @@
 const asyncHandler = require("express-async-handler");
+const bcrypt = require("bcrypt");
 const { Message } = require("../Models/message.model");
 const { User } = require("../Models/user.model");
 const { Chat } = require("../Models/chat.model");
@@ -50,4 +51,109 @@ const allMessages = asyncHandler(async (req, res) => {
   }
 });
 
-module.exports = { sendMessage, allMessages };
+const sendMessageFromElseWhere = asyncHandler(async (req, res) => {
+  const userId = req.params.userId;
+  const userToSend = await User.findOne({ _id: userId });
+  const { name, email, mobile, message } = req.body;
+  const userExist = await User.findOne({ email });
+  if (!userExist) {
+    bcrypt.hash(mobile, 4, async function (err, hash) {
+      if (err) {
+        res.status(400).send(err.message);
+      }
+      const newUser = await User.create({
+        name,
+        email,
+        password: hash,
+        mobile,
+      });
+
+      if (newUser) {
+        var chatData = {
+          chatName: `${newUser.name} - Admin`,
+          isGroupChat: false,
+          users: [newUser._id, userToSend._id],
+        };
+
+        try {
+          const chatCreate = await Chat.create(chatData);
+
+          var messageData = {
+            sender: newUser._id,
+            content: message,
+            chat: chatCreate._id,
+          };
+
+          var messageCreate = await Message.create(messageData);
+          await Chat.findByIdAndUpdate(chatCreate._id, {
+            latestMessage: messageCreate,
+          });
+
+          return res.status(201).json({
+            password:
+              "Your mobile number is your Password you can change it anytime.",
+            message: "Successfully Registered",
+            newUser,
+            token: generateToken(newUser._id),
+          });
+        } catch (error) {
+          res.status(400).send({
+            msg: "Catch block of creating and getting chat while register a new User",
+          });
+        }
+      } else {
+        res.status(400);
+        throw new Error("Unable to register");
+      }
+    });
+  } else {
+    try {
+      var isChat = await Chat.find({
+        isGroupChat: false,
+        $and: [
+          { users: { $elemMatch: { $eq: userExist._id } } },
+          { users: { $elemMatch: { $eq: userToSend._id } } },
+        ],
+      });
+
+      if (isChat.length > 0) {
+        var messageContent = {
+          sender: userExist._id,
+          content: message,
+          chat: isChat[0]._id,
+        };
+        var messageCreate = await Message.create(messageContent);
+        await Chat.findByIdAndUpdate(isChat[0]._id, {
+          latestMessage: messageCreate,
+        });
+      } else {
+        var chatData = {
+          chatName: `${name} - ${userToSend.name}`,
+          isGroupChat: false,
+          users: [userExist._id, userToSend._id],
+        };
+        const chatCreate = await Chat.create(chatData);
+        var messageContent = {
+          sender: userExist._id,
+          content: message,
+          chat: chatCreate._id,
+        };
+
+        var messageCreate = await Message.create(messageContent);
+        await Chat.findByIdAndUpdate(chatCreate._id, {
+          latestMessage: messageCreate,
+        });
+      }
+      return res.status(201).json({
+        message: "Message successfully send.",
+      });
+    } catch (error) {
+      res.status(400);
+      throw new Error({
+        msg: "Catch block of creating and getting chat while register a new User",
+      });
+    }
+  }
+});
+
+module.exports = { sendMessage, allMessages, sendMessageFromElseWhere };

@@ -4,6 +4,7 @@ const {
   loginUser,
   allUser,
   deleteAccount,
+  updateUser,
 } = require("../controllers/userController");
 const { authentication } = require("../middleware/authentication");
 
@@ -26,5 +27,7 @@ userRouter.route("/register").post(registerUser);
 userRouter.route("/").get(authentication, allUser);
 
 userRouter.delete("/deleteAccount", authentication, deleteAccount);
+
+userRouter.patch("/:id", authentication, updateUser);
 
 module.exports = { userRouter };
