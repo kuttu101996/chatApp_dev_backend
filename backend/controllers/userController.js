@@ -162,29 +162,43 @@ const deleteAccount = asyncHandler(async (req, res) => {
 
 const updateUser = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const { name, password, pic, mobile } = req.body;
+  const { name, oldPassword, newPassword, pic, mobile } = req.body;
   let updatedUser;
+  const user = await User.findOne({ _id: id });
 
-  if (name) {
-    updatedUser = await User.findByIdAndUpdate(id, { name }, { new: true });
-  } else if (password) {
-    bcrypt.hash(password, 4, async function (err, hash) {
-      if (err) {
-        return res.status(400).send(err.message);
+  try {
+    if (name && user.name !== name) {
+      updatedUser = await User.findByIdAndUpdate(id, { name }, { new: true });
+    }
+    if (oldPassword && newPassword) {
+      if (user && (await userExist.matchPass(oldPassword))) {
+        bcrypt.hash(newPassword, 4, async function (err, hash) {
+          if (err) {
+            return res.status(400).send(err.message);
+          }
+          updatedUser = await User.findByIdAndUpdate(
+            id,
+            { password: hash },
+            { new: true }
+          );
+        });
       }
-      updatedUser = await User.findByIdAndUpdate(
-        id,
-        { password: hash },
-        { new: true }
-      );
-    });
-  } else if (pic) {
-    updatedUser = await User.findByIdAndUpdate(id, { pic }, { new: true });
-  } else if (mobile) {
-    updatedUser = await User.findByIdAndUpdate(id, { mobile }, { new: true });
-  }
+    }
+    if (pic && user.pic !== pic) {
+      updatedUser = await User.findByIdAndUpdate(id, { pic }, { new: true });
+    }
+    if (mobile && user.mobile !== mobile) {
+      updatedUser = await User.findByIdAndUpdate(id, { mobile }, { new: true });
+    }
 
-  return res.status(201).send(updatedUser);
+    return res
+      .status(201)
+      .send({ msg: "Data updated successfully", user: updatedUser });
+  } catch (error) {
+    res
+      .status(400)
+      .send({ msg: "Unable to update, Catch Block.", error: error.message });
+  }
 });
 
 module.exports = {
