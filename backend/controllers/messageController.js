@@ -90,6 +90,14 @@ const sendMessageFromElseWhere = asyncHandler(async (req, res) => {
                 await Chat.findByIdAndUpdate(chatCreate._id, {
                   latestMessage: messageCreate._id,
                 });
+                return res.status(201).json({
+                  password:
+                    "Your mobile number is your Password you can change it anytime.",
+                  message: "Successfully Registered",
+                  newUser,
+                  chatCreate,
+                  messageCreate,
+                });
               }
             } catch (error) {
               res.status(400).send({
@@ -97,15 +105,6 @@ const sendMessageFromElseWhere = asyncHandler(async (req, res) => {
               });
             }
           }
-
-          return res.status(201).json({
-            password:
-              "Your mobile number is your Password you can change it anytime.",
-            message: "Successfully Registered",
-            newUser,
-            chatCreate,
-            messageCreate
-          });
         } catch (error) {
           res.status(400).send({
             msg: "Catch block of creating and getting chat while register a new User",
