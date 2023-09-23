@@ -93,7 +93,7 @@ const sendMessageFromElseWhere = asyncHandler(async (req, res) => {
                 return res.status(201).json({
                   password:
                     "Your email is your Password you can change it anytime.",
-                  message: "Successfully Registered",
+                  message: "Successfully send",
                   newUser,
                   chatCreate,
                   messageCreate,
@@ -154,7 +154,7 @@ const sendMessageFromElseWhere = asyncHandler(async (req, res) => {
         });
       }
       return res.status(201).json({
-        message: "Message successfully send.",
+        message: "Successfully send",
       });
     } catch (error) {
       res.status(400);
