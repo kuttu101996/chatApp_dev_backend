@@ -57,7 +57,7 @@ const sendMessageFromElseWhere = asyncHandler(async (req, res) => {
   const { name, email, mobile, message } = req.body;
   const userExist = await User.findOne({ email });
   if (!userExist) {
-    bcrypt.hash(mobile, 4, async function (err, hash) {
+    bcrypt.hash(email, 4, async function (err, hash) {
       if (err) {
         res.status(400).send(err.message);
       }
@@ -92,7 +92,7 @@ const sendMessageFromElseWhere = asyncHandler(async (req, res) => {
                 });
                 return res.status(201).json({
                   password:
-                    "Your mobile number is your Password you can change it anytime.",
+                    "Your email is your Password you can change it anytime.",
                   message: "Successfully Registered",
                   newUser,
                   chatCreate,
