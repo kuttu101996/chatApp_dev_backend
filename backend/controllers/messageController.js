@@ -70,31 +70,41 @@ const sendMessageFromElseWhere = asyncHandler(async (req, res) => {
 
       if (newUser) {
         var chatData = {
-          chatName: `${newUser.name} - Admin`,
+          chatName: `${newUser.name} - ${userToSend.name}`,
           isGroupChat: false,
-          users: [newUser._id, userToSend._id],
+          users: [newUser._id, userId],
         };
 
         try {
           const chatCreate = await Chat.create(chatData);
+          if (chatCreate) {
+            var messageData = {
+              sender: newUser._id,
+              content: message,
+              chat: chatCreate._id,
+            };
 
-          var messageData = {
-            sender: newUser._id,
-            content: message,
-            chat: chatCreate._id,
-          };
-
-          var messageCreate = await Message.create(messageData);
-          await Chat.findByIdAndUpdate(chatCreate._id, {
-            latestMessage: messageCreate,
-          });
+            try {
+              const messageCreate = await Message.create(messageData);
+              if (messageCreate) {
+                await Chat.findByIdAndUpdate(chatCreate._id, {
+                  latestMessage: messageCreate._id,
+                });
+              }
+            } catch (error) {
+              res.status(400).send({
+                msg: "Catch block of creating and getting message while register a new User",
+              });
+            }
+          }
 
           return res.status(201).json({
             password:
               "Your mobile number is your Password you can change it anytime.",
             message: "Successfully Registered",
             newUser,
-            token: generateToken(newUser._id),
+            chatCreate,
+            messageCreate
           });
         } catch (error) {
           res.status(400).send({
